@@ -478,6 +478,7 @@ const std::vector<Field> &fields() {
                 s.mouse_sensitivity = variable_float(t, 0.10f, kMinMouseSensitivity, kMaxMouseSensitivity);
             }},
         BOOL_FIELD("input.touch_controls", touch_controls),
+        BOOL_FIELD("input.touch_with_keyboard", touch_with_keyboard),
         BOOL_FIELD("input.touch_psp.floating_stick", touch_psp.floating_stick),
         BOOL_FIELD("input.touch_adaptive.floating_stick", touch_adaptive.floating_stick),
         BOOL_FIELD("input.touch_adaptive_hub.floating_stick", touch_adaptive_hub.floating_stick),

@@ -65,6 +65,9 @@ surface or free-space camera. Sliding outside an ordinary button does not conver
 it into another action. Posture changes cancel old attack/special contacts while
 preserving movement, camera, evade and item selection. Context, weapon, layout,
 input-source and focus changes cancel stale contacts and pending item input.
+With *Keep On-Screen Controls with a Keyboard* (`input.touch_with_keyboard`) the
+keyboard is no longer such a change: it leaves the controls shown and their
+contacts held, so a physical keyboard and touch can be used at once.
 
 The attack selector waits up to 110 ms before selecting a held primary action.
 A released tap uses an 85 ms pulse. Direction recognition latches one action for

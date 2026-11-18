@@ -142,8 +142,11 @@ struct Settings {
     input::PresetChoice control_preset{input::Preset::Default, {}};
     std::vector<input::UserPreset> user_presets;
     // On-screen controls for a touch screen, shown once the screen is touched
-    // and hidden again when a gamepad or the keyboard is used.
+    // and hidden again when a gamepad, the keyboard or a real mouse is used.
+    // touch_with_keyboard leaves them shown, and their contacts held, while a
+    // physical keyboard is used: a phone can have both, as the Titan 2 does.
     bool touch_controls{true};
+    bool touch_with_keyboard{};       // the keyboard does not take over from them
     bool touch_dpad{true};            // the D-pad among them, for the game's menus
     float touch_opacity{0.5f};        // 0.1-1
     float touch_size{1.0f};           // 0.6-1.6 of the default size

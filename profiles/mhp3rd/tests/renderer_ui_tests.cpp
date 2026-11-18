@@ -3915,6 +3915,9 @@ void touch_event_contracts(gpu::VulkanRenderer &renderer) {
     expect(!renderer.touch_controls_visible() && !renderer.action_touch_controls().held(input::touch::Element::Attack),
         "losing game input hides overlay and releases action fingers");
     renderer.set_game_input(true);
+    // Let the resume suppression pass with nothing held, so the touch press
+    // below is a new one the game sees rather than a suppressed leftover.
+    renderer.pump_events();
     finger(SDL_EVENT_FINGER_DOWN, 6, attack);
     SDL_Event keyboard{};
     keyboard.type = SDL_EVENT_KEY_DOWN;
@@ -3926,6 +3929,43 @@ void touch_event_contracts(gpu::VulkanRenderer &renderer) {
     renderer.pump_events();
     expect(!renderer.touch_controls_visible() && !renderer.action_touch_controls().held(input::touch::Element::Attack),
         "keyboard takeover releases touch controls");
+    keyboard.type = SDL_EVENT_KEY_UP;
+    keyboard.key.down = false;
+    SDL_PushEvent(&keyboard);
+    renderer.pump_events();
+    // On a phone with both, the keyboard can leave the controls and their
+    // contacts alone (input.touch_with_keyboard). A different key keeps SDL's
+    // repeat suppression out of the way.
+    player.touch_with_keyboard = true;
+    finger(SDL_EVENT_FINGER_DOWN, 6, attack);
+    expect(renderer.touch_controls_visible() && renderer.action_touch_controls().held(input::touch::Element::Attack),
+        "the kept touch controls take a finger again");
+    const std::uint32_t attack_buttons = renderer.pad().buttons;
+    keyboard.key.key = SDLK_L;
+    keyboard.key.scancode = SDL_SCANCODE_L;
+    keyboard.type = SDL_EVENT_KEY_DOWN;
+    keyboard.key.down = true;
+    expect(SDL_PushEvent(&keyboard), "keyboard event queues with the controls kept");
+    renderer.pump_events();
+    expect(renderer.touch_controls_visible() && renderer.action_touch_controls().held(input::touch::Element::Attack),
+        "a key press leaves the kept touch controls shown and held");
+    expect((renderer.pad().buttons & attack_buttons) == attack_buttons,
+        "the held touch press still reaches the game while a key goes down");
+    SDL_Event mouse_event{};
+    mouse_event.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    mouse_event.button.windowID = SDL_GetWindowID(renderer.window());
+    mouse_event.button.which = gpu::kScriptedMouse;
+    mouse_event.button.button = 1;
+    mouse_event.button.down = true;
+    expect(SDL_PushEvent(&mouse_event), "mouse event queues with the controls kept");
+    renderer.pump_events();
+    expect(!renderer.touch_controls_visible() && !renderer.action_touch_controls().held(input::touch::Element::Attack),
+        "a real mouse still takes over from the kept touch controls");
+    mouse_event.type = SDL_EVENT_MOUSE_BUTTON_UP;
+    mouse_event.button.down = false;
+    SDL_PushEvent(&mouse_event);
+    renderer.pump_events();
+    player.touch_with_keyboard = false;
     keyboard.type = SDL_EVENT_KEY_UP;
     keyboard.key.down = false;
     SDL_PushEvent(&keyboard);
@@ -6397,6 +6437,7 @@ void menu_contracts(gpu::VulkanRenderer &renderer, psprecomp::Runtime &runtime, 
     toggle_setting("Invert Mouse Horizontally", &settings::Settings::invert_mouse_x);
     toggle_setting("Invert Mouse Vertically", &settings::Settings::invert_mouse_y);
     toggle_setting("On-Screen Controls", &settings::Settings::touch_controls);
+    toggle_setting("Keep On-Screen Controls with a Keyboard", &settings::Settings::touch_with_keyboard);
     auto slider_setting = [&](const char *label, float settings::Settings::*field, float step) {
         const float original = settings::current().*field;
         change_video(label, ImGuiKey_RightArrow);
@@ -6439,6 +6480,7 @@ void menu_contracts(gpu::VulkanRenderer &renderer, psprecomp::Runtime &runtime, 
     settings::current().mouse_sensitivity = 0.8f;
     settings::current().touch_size = 1.4f;
     settings::current().touch_opacity = 0.4f;
+    settings::current().touch_with_keyboard = !settings::defaults().touch_with_keyboard;
     settings::current().free_camera_speed = 450;
     settings::current().free_camera = true;
     settings::current().free_camera_hide_hud = !settings::defaults().free_camera_hide_hud;
@@ -6454,6 +6496,7 @@ void menu_contracts(gpu::VulkanRenderer &renderer, psprecomp::Runtime &runtime, 
             reset_controls.background_gamepad == defaults.background_gamepad &&
             reset_controls.touch_size == defaults.touch_size &&
             reset_controls.touch_opacity == defaults.touch_opacity &&
+            reset_controls.touch_with_keyboard == defaults.touch_with_keyboard &&
             reset_controls.control_preset == defaults.control_preset && reset_controls.controls == defaults.controls,
         "control defaults restore modified analog, mouse, touch, name and shipped bindings");
     expect(reset_controls.free_camera && reset_controls.free_camera_speed == 450 &&

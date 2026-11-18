@@ -1107,7 +1107,8 @@ void Menu::controls() {
     {
         RowOptions o = options_for("input.touch_controls",
             "Controls drawn over the game once the screen is touched, in the layout below. "
-            "They hide again when a gamepad or the keyboard is used.");
+            "They hide again when a gamepad, a real mouse or the keyboard is used, unless the "
+            "setting below keeps them.");
         if (toggle_row("On-Screen Controls", s.touch_controls, o)) {
             s.touch_controls = !s.touch_controls;
             settings::save();
@@ -1119,6 +1120,14 @@ void Menu::controls() {
             }
             return options;
         };
+        if (toggle_row("Keep On-Screen Controls with a Keyboard", s.touch_with_keyboard,
+                off(options_for("input.touch_with_keyboard",
+                    "On: a physical keyboard leaves the on-screen controls shown and their contacts "
+                    "held, so typing and touch work together on a phone that has both, such as the "
+                    "Titan 2. Off: a key press hides the controls and lets go of what touch holds.")))) {
+            s.touch_with_keyboard = !s.touch_with_keyboard;
+            settings::save();
+        }
         const bool action = s.touch_layout != settings::TouchLayout::Psp;
         const bool adaptive = s.touch_layout == settings::TouchLayout::Adaptive;
         static constexpr const char *layouts[] = {"PSP buttons", "Action", "Adaptive"};
@@ -1212,6 +1221,7 @@ void Menu::controls() {
         restore("input.invert_mouse_x", s.invert_mouse_x, d.invert_mouse_x);
         restore("input.invert_mouse_y", s.invert_mouse_y, d.invert_mouse_y);
         restore("input.touch_controls", s.touch_controls, d.touch_controls);
+        restore("input.touch_with_keyboard", s.touch_with_keyboard, d.touch_with_keyboard);
         restore("input.touch_dpad", s.touch_dpad, d.touch_dpad);
         s.touch_psp.at(input::touch::PspElement::DPad).shown = s.touch_dpad;
         restore("input.touch_opacity", s.touch_opacity, d.touch_opacity);

@@ -1287,8 +1287,12 @@ struct VulkanRenderer::Impl {
         const bool finger = event.type == SDL_EVENT_FINGER_DOWN || event.type == SDL_EVENT_FINGER_MOTION ||
             event.type == SDL_EVENT_FINGER_UP || event.type == SDL_EVENT_FINGER_CANCELED;
         if (!finger) {
-            // A gamepad, the keyboard or a real mouse takes over: hide.
-            const bool other = event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN || event.type == SDL_EVENT_KEY_DOWN ||
+            // A gamepad, the keyboard or a real mouse takes over: hide. With
+            // input.touch_with_keyboard the keyboard leaves the controls and
+            // their contacts alone, so typing and touch work together on a
+            // phone that has both; the gamepad and the mouse still take over.
+            const bool keyboard = event.type == SDL_EVENT_KEY_DOWN && !settings::current().touch_with_keyboard;
+            const bool other = event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN || keyboard ||
                 (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.which != SDL_TOUCH_MOUSEID) ||
                 (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION && std::abs(static_cast<int>(event.gaxis.value)) > 16000);
             if (other && touch_visible) {

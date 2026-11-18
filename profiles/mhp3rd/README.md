@@ -350,7 +350,7 @@ Every controller is also logged when it appears, with `[pad]`: name, USB ids, GU
 
 ### Touch screen
 
-On a touch screen (the Android app, or any screen SDL reports touches from) controls are drawn over the game once it is touched, and hidden again when a gamepad or the keyboard is used. Controls → *Touch screen* → *Layout* chooses between two:
+On a touch screen (the Android app, or any screen SDL reports touches from) controls are drawn over the game once it is touched, and hidden again when a gamepad, a real mouse or the keyboard is used. *Keep On-Screen Controls with a Keyboard* (`input.touch_with_keyboard`) leaves them shown, and their contacts held, while a physical keyboard is used, so typing and touch work together on a phone that has both, such as the Titan 2; a gamepad and a real mouse still take over. Controls → *Touch screen* → *Layout* chooses between two:
 
 - **PSP buttons** (the default): a stick that appears where the left thumb lands, the four face buttons in the PSP's diamond on the right, L and R at the top corners, a D-pad at the left edge, and Select, the menu button and Start small at the top. R3 sits in the bottom-right corner and uses the gamepad's R3 assignment (lock-on by default). The small *D-PAD* button hides or shows the D-pad during play, releases held directions when hidden and saves the same visibility state used by the editor. The ordinary Controls menu hides the legacy D-Pad switch; its underlying setting is retained.
 - **Action**: large buttons named for what they do, each pressing a PSP button or two in the same frame:
@@ -657,6 +657,7 @@ The Android app starts from other defaults where a phone differs, with the same 
 | Controls | Mouse Sensitivity | `input.mouse_sensitivity` | `MHP3RD_MOUSE_SENSITIVITY` | Degrees of camera turn per count of mouse motion, 0.01 to 0.99; default 0.10 |
 | Controls | Invert Mouse Horizontally / Vertically | `input.invert_mouse_x`, `input.invert_mouse_y` | | For the mouse camera and aim |
 | Controls | On-Screen Controls | `input.touch_controls` | | On (default): a touch screen shows the on-screen controls once it is touched |
+| Controls | Keep On-Screen Controls with a Keyboard | `input.touch_with_keyboard` | | Off (default): a key press hides the on-screen controls and releases what touch holds. On: the keyboard does not take over from them, so typing and touch work together on a phone that has both; a gamepad and a real mouse still take over |
 | Controls | Layout | `input.touch_layout` | `MHP3RD_TOUCH_LAYOUT` | `psp` (PSP buttons, the default), `action` or `adaptive`; see [Touch screen](#touch-screen) |
 | Controls | Edit the Action Layout… | `input.touch_action.<element>` | | Where each element of the Action layout is, what it presses and whether it is shown |
 | Controls | Adaptive Floating Stick | `input.touch_adaptive.floating_stick` | | Floating under the left thumb, or fixed at its edited position |

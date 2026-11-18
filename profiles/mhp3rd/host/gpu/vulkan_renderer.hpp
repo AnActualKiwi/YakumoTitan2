@@ -118,7 +118,8 @@ public:
     // motion made while the pointer was captured for the game counts.
     [[nodiscard]] MouseMotion take_mouse_motion() noexcept;
     // The on-screen touch controls: shown once the screen is touched while the
-    // game runs, hidden again by a gamepad, the keyboard or a real mouse.
+    // game runs, hidden again by a gamepad, the keyboard or a real mouse, except
+    // that the keyboard leaves them alone when input.touch_with_keyboard is on.
     [[nodiscard]] bool touch_controls_visible() const noexcept;
     [[nodiscard]] const input::touch::Controls &touch_controls() const;
     // The action layout's controls (#174), which take the fingers instead

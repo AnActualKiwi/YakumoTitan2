@@ -38,6 +38,11 @@ void test_android() {
     check(android.analog_camera && android.right_stick == RightStick::Camera,
         "the analog camera is on, as the touch camera needs");
     check(android.touch_controls, "the touch controls are on");
+    check(!android.touch_with_keyboard, "the keyboard still takes over from the touch controls");
+    const auto kept = from_entries({{"input.touch_with_keyboard", "1"}});
+    check(kept.touch_with_keyboard && from_entries(to_entries(kept)).touch_with_keyboard &&
+            !from_entries({{"input.touch_with_keyboard", "invalid"}}).touch_with_keyboard,
+        "keeping the touch controls with a keyboard round trips and rejects nonsense");
     check(android.frame_rate == FrameRate::Fps30 && android.frame_rate_auto, "30 fps, lowered when behind");
     check(android.present_mode == PresentMode::Fifo && android.perf == PerfDisplay::Off,
         "vsync on and no performance overlay");
